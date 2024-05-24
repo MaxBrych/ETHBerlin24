@@ -17,7 +17,7 @@ const query = `{
   }
 }`;
 
-export const SocialList = () => {
+export const ProfilePage = () => {
   const { data, loading, error } = useQuery(query);
 
   console.log("Query:", query);
