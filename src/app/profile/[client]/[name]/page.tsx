@@ -2,6 +2,96 @@
 import { useEffect, useState } from "react";
 import { init, useQuery } from "@airstack/airstack-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import GET_PROFILE_INFO from "@/path/to/queries";
+
+const query = `
+  query GetProfileInfo($identity: Identity!) {
+    Wallet(input: { identity: $identity, blockchain: ethereum }) {
+      addresses
+      primaryDomain {
+        name
+        avatar
+        tokenNft {
+          contentValue {
+            image {
+              small
+            }
+          }
+        }
+      }
+      domains(input: { filter: { isPrimary: { _eq: false } } }) {
+        name
+        avatar
+        tokenNft {
+          contentValue {
+            image {
+              small
+            }
+          }
+        }
+      }
+      xmtp {
+        isXMTPEnabled
+      }
+    }
+    farcasterSocials: Socials(
+      input: {
+        filter: { identity: { _eq: $identity }, dappName: { _eq: farcaster } }
+        blockchain: ethereum
+        order: { followerCount: DESC }
+      }
+    ) {
+      Social {
+        isDefault
+        blockchain
+        dappName
+        profileName
+        profileDisplayName
+        profileHandle
+        profileImage
+        profileBio
+        followerCount
+        followingCount
+        profileTokenId
+        profileTokenAddress
+        profileCreatedAtBlockTimestamp
+        profileImageContentValue {
+          image {
+            small
+          }
+        }
+      }
+    }
+    lensSocials: Socials(
+      input: {
+        filter: { identity: { _eq: $identity }, dappName: { _eq: lens } }
+        blockchain: ethereum
+        order: { followerCount: DESC }
+      }
+    ) {
+      Social {
+        isDefault
+        blockchain
+        dappName
+        profileName
+        profileDisplayName
+        profileHandle
+        profileImage
+        profileBio
+        followerCount
+        followingCount
+        profileTokenId
+        profileTokenAddress
+        profileCreatedAtBlockTimestamp
+        profileImageContentValue {
+          image {
+            small
+          }
+        }
+      }
+    }
+  }
+`;
 
 export default function ProfilePage({ params }: { params: { client: string; name: string } }) {
   const { client, name } = params;
@@ -15,47 +105,11 @@ export default function ProfilePage({ params }: { params: { client: string; name
     }
   }, []);
 
-  const lensQuery = `query {
-    Socials(input: { filter: { identity: { _eq: "${name}" }, dappName: { _eq: "lens" } }, blockchain: "ethereum" }) {
-      Social {
-        profileName
-        profileTokenId
-        profileTokenIdHex
-        userAssociatedAddresses
-        profileBio
-        profileDisplayName
-        profileImage
-        profileUrl
-      }
-    }
-  }`;
+  const variables = {
+    identity: client === "lens" ? `lens/@${name}` : name,
+  };
 
-  const farcasterQuery = `query {
-    Socials(input: { filter: { identity: { _eq: "${name}" }, dappName: { _eq: "farcaster" } }, blockchain: "ethereum" }) {
-      Social {
-        profileName
-        profileTokenId
-        profileTokenIdHex
-        userAssociatedAddresses
-        profileBio
-        profileDisplayName
-        profileImage
-        profileUrl
-      }
-    }
-  }`;
-
-  const ensQuery = `query {
-    Domains(input: { filter: { owner: { _eq: "${name}" } }, blockchain: "ethereum" }) {
-      Domain {
-        name
-      }
-    }
-  }`;
-
-  const query = client === "lens" ? lensQuery : client === "farcaster" ? farcasterQuery : ensQuery;
-
-  const { data, loading, error } = useQuery(apiInitialized ? query : "");
+  const { data, loading, error } = useQuery(apiInitialized ? { query, variables } : null);
 
   useEffect(() => {
     if (client) setSelectedTab(client);
@@ -67,6 +121,12 @@ export default function ProfilePage({ params }: { params: { client: string; name
       console.error("Query:", query);
     }
   }, [error, query]);
+
+  useEffect(() => {
+    if (query) {
+      console.log("Executing query:", query);
+    }
+  }, [query]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -81,26 +141,26 @@ export default function ProfilePage({ params }: { params: { client: string; name
           <TabsTrigger value="ens">ENS</TabsTrigger>
         </TabsList>
         <TabsContent value="lens">
-          {selectedTab === "lens" && data && (
+          {selectedTab === "lens" && data?.lensSocials?.Social && (
             <div>
               <h2>Lens Profile</h2>
-              <pre>{JSON.stringify(data, null, 2)}</pre>
+              <pre>{JSON.stringify(data.lensSocials.Social, null, 2)}</pre>
             </div>
           )}
         </TabsContent>
         <TabsContent value="farcaster">
-          {selectedTab === "farcaster" && data && (
+          {selectedTab === "farcaster" && data?.farcasterSocials?.Social && (
             <div>
               <h2>Farcaster Profile</h2>
-              <pre>{JSON.stringify(data, null, 2)}</pre>
+              <pre>{JSON.stringify(data.farcasterSocials.Social, null, 2)}</pre>
             </div>
           )}
         </TabsContent>
         <TabsContent value="ens">
-          {selectedTab === "ens" && data && (
+          {selectedTab === "ens" && data?.Wallet?.domains && (
             <div>
               <h2>ENS Domains</h2>
-              <pre>{JSON.stringify(data, null, 2)}</pre>
+              <pre>{JSON.stringify(data.Wallet.domains, null, 2)}</pre>
             </div>
           )}
         </TabsContent>
