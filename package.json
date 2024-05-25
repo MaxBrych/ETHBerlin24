@@ -15,18 +15,19 @@
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@lens-protocol/react-web": "^2.2.0",
+    "@lens-protocol/wagmi": "^4.1.2",
     "@mui/material": "^5.15.18",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-tabs": "^1.0.4",
+    "@thirdweb-dev/sdk": "^4.0.87",
     "@web3modal/wagmi": "^4.2.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "install": "^0.13.0",
     "lucide-react": "^0.379.0",
     "next": "14.2.3",
-    "npm": "^10.8.0",
-    "react": "^18",
-    "react-dom": "^18",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "wagmi": "^2.9.7",
@@ -41,5 +42,10 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "resolutions": {
+    "i18next": "23.11.5",
+    "react": "18.2.0"
   }
+  
 }

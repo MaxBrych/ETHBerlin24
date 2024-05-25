@@ -1,13 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import { init, useQuery } from "@airstack/airstack-react";
-import GET_PROFILE_INFO from "@/graphql/query";
+import GET_FC_INFO from "@/graphql/farcaster";
 import CastsList from "@/components/CastsList";
 import { usePublications, PublicationType, LimitType } from "@lens-protocol/react-web";
 
 export default function ProfilePage() {
   const [apiInitialized, setApiInitialized] = useState(false);
-  const identity = "lens/@maxbrych";
+  const identity = "fc_fname:cjack60";
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -17,13 +17,13 @@ export default function ProfilePage() {
   }, []);
 
   const { data, loading, error } = useQuery(
-    apiInitialized ? GET_PROFILE_INFO : "",
+    apiInitialized ? GET_FC_INFO : "",
     apiInitialized ? { identity } : null
   );
 
   useEffect(() => {
     if (apiInitialized) {
-      console.log("Query being sent:", GET_PROFILE_INFO);
+      console.log("Query being sent:", GET_FC_INFO);
       console.log("Variables being sent:", { identity });
     }
   }, [apiInitialized]);
