@@ -1,7 +1,6 @@
 "use client";
 import { SearchBar } from "@/components/SearchBar";
-import UniversalResolver from "@/components/UniversalResolver";
-import UNIVERSAL_RESOLVER from "../graphql/resolve";
+import UNIVERSAL_RESOLVER from "../graphql/query";
 import { useLazyQuery } from "@airstack/airstack-react";
 
 export default function Home() {

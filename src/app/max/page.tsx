@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { init, useQuery } from "@airstack/airstack-react";
 import GET_PROFILE_INFO from "@/graphql/query";
 import CastsList from "@/components/CastsList";
+import { usePublications, PublicationType, LimitType } from "@lens-protocol/react-web";
 
 export default function ProfilePage() {
   const [apiInitialized, setApiInitialized] = useState(false);
@@ -89,9 +90,50 @@ export default function ProfilePage() {
         data.lensSocials.Social.map((profile, index) => (
           <div key={index} className="w-full max-w-2xl">
             {renderProfileSection("Lens Profile", profile)}
+            <Publications handle={profile.profileHandle} />
           </div>
         ))}
       {data?.FarcasterCasts?.Cast && <CastsList casts={data.FarcasterCasts.Cast} />}
+    </div>
+  );
+}
+
+function Publications({ handle }) {
+  const { data: publications } = usePublications({
+    where: {
+      publicationTypes: [PublicationType.Post],
+      from: [handle],
+    },
+    limit: LimitType.TwentyFive,
+  });
+
+  return (
+    <div className="bg-gray-800 text-white rounded-lg shadow-md p-6 mt-6 w-full max-w-2xl">
+      <h2 className="text-xl font-bold mb-4">Lens Publications</h2>
+      {publications?.length > 0 ? (
+        publications.map((pub, index) => (
+          <div key={index} className="border-b border-gray-700 py-4">
+            <p>{pub.metadata.content}</p>
+            {pub.metadata?.asset?.image?.optimized?.uri && (
+              <img
+                width="400"
+                height="400"
+                alt="Publication"
+                className="mt-6 mb-2 rounded-xl"
+                src={pub.metadata?.asset?.image?.optimized?.uri}
+              />
+            )}
+            <div className="mt-4 flex space-x-4 text-sm text-gray-400">
+              <span>Comments: {pub.stats.comments}</span>
+              <span>Mirrors: {pub.stats.mirrors}</span>
+              <span>Likes: {pub.stats.upvotes}</span>
+              <span>Collects: {pub.stats.collects}</span>
+            </div>
+          </div>
+        ))
+      ) : (
+        <p>No publications available</p>
+      )}
     </div>
   );
 }
